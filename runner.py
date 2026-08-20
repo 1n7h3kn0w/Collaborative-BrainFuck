@@ -63,6 +63,32 @@ def RunInterpreter(machine: BrainFuck, SourceCode: str):
     CodeLen = len(code)
     CodePointer = 0
     
-    # TODO finish interpreter code
+    # TODO finish loop code
+    
+    while(CodePointer < CodeLen):
+        char = code[CodePointer]
+        match char:
+            case "+":
+                machine.add()
+                CodePointer += 1
+            case "-":
+                machine.sub()
+                CodePointer += 1
+            case ">":
+                machine.MoveLeft()
+                CodePointer += 1
+            case "<":
+                machine.MoveRight()
+                CodePointer += 1
+            case ",":
+                machine.inp()
+                CodePointer += 1
+            case ".":
+                machine.out()
+                CodePointer += 1
+            case "[":
+                pass
+            case "]":
+                pass
     
     return 0
