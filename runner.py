@@ -21,17 +21,13 @@ class BrainFuck():
         return 0
     
     def add(self):
-        if(self.tape[self.pointer] == 255):
-            self.tape[self.pointer] = 0
-            return 0
         self.tape[self.pointer] += 1
+        self.tape[self.pointer] &= 0xff
         return 0
     
     def sub(self):
-        if(self.tape[self.pointer] == 0):
-            self.tape[self.pointer] == 255
-            return 0
         self.tape[self.pointer] -= 1
+        self.tape[self.pointer] &= 0xff
         return 0
     
     def out(self):
@@ -63,7 +59,12 @@ def RunInterpreter(machine: BrainFuck, SourceCode: str):
     CodeLen = len(code)
     CodePointer = 0
     
-    # TODO finish loop code
+    # TODO fix loop code
+    
+    # This section defines all required variables for loops
+    LoopStack = []
+    LoopDepth = 0
+    LoopSkip = False
     
     while(CodePointer < CodeLen):
         char = code[CodePointer]
@@ -87,8 +88,35 @@ def RunInterpreter(machine: BrainFuck, SourceCode: str):
                 machine.out()
                 CodePointer += 1
             case "[":
-                pass
+                if(machine.tape[machine.pointer] == 0):
+                    LoopSkip = True
+                    LoopDepth = 1
+                    while(LoopSkip):
+                        CodePointer +=1
+                        char = code[CodePointer]
+                        match char:
+                            case "[":
+                                LoopDepth += 1
+                            case "]":
+                                LoopDepth -= 1
+                        if(LoopDepth == 0):
+                            LoopSkip = False
+                if(machine.tape[machine.pointer] != 0):
+                    LoopStack.append(CodePointer)
+                    CodePointer += 1
             case "]":
-                pass
+                if(LoopStack != []):
+                    CodePointer = LoopStack.pop()
+                else:
+                    CodePointer += 1
     
     return 0
+
+# TODO remove this test for "prod"
+# This is just test code for my interpreter
+
+interpreter = BrainFuck(100)
+
+BFcode = "++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>.>---.+++++++..+++.>>.<-.<.+++.------.--------.>>+.>++."
+
+RunInterpreter(interpreter, BFcode)
